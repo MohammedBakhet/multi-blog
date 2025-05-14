@@ -18,7 +18,7 @@ export default function Home() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Something went wrong");
-      router.push("/dashboard");
+      router.push("/explore");
     } catch (err: any) {
       setError(err.message);
     }
