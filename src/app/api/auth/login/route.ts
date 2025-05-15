@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { generateToken, comparePasswords } from '../../../../lib/auth';
-import { dbConnect } from '../../../../lib/mongodb';
-import mongoose from 'mongoose';
+import clientPromise from '../../../../lib/mongodb';
 
 export async function POST(request: Request) {
   try {
-    // Anslut till databasen
-    await dbConnect();
-    
+    const client = await clientPromise;
+    const db = client.db();
     // Hämta data från begäran
     const body = await request.json();
     const { email, password } = body;
@@ -20,11 +18,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hämta användarmodellen direkt från mongoose
-    const UserModel = mongoose.models.User || mongoose.model('User');
-    
-    // Sök efter användaren
-    const user = await UserModel.findOne({ email });
+    // Sök efter användaren i users-kollektionen
+    const user = await db.collection('users').findOne({ email });
     
     // Användaren hittades inte
     if (!user) {

@@ -1,8 +1,9 @@
 {
-  "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js",
-  "/api/auth/logout/route": "app/api/auth/logout/route.js",
-  "/page": "app/page.js",
-  "/auth/register/page": "app/auth/register/page.js",
+  "/api/users/me/route": "app/api/users/me/route.js",
+  "/api/posts/route": "app/api/posts/route.js",
+  "/api/posts/[id]/comment/route": "app/api/posts/[id]/comment/route.js",
+  "/api/posts/[id]/like/route": "app/api/posts/[id]/like/route.js",
+  "/post/page": "app/post/page.js",
+  "/(authenticated)/profile/page": "app/(authenticated)/profile/page.js",
   "/(authenticated)/explore/page": "app/(authenticated)/explore/page.js"
 }

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { hashPassword } from '../../../../lib/auth';
-import { dbConnect } from '../../../../lib/mongodb';
-import User from '../../../../models/User';
+import clientPromise from '../../../../lib/mongodb';
 
 export async function POST(request: Request) {
   try {
-    await dbConnect();
+    const client = await clientPromise;
+    const db = client.db();
     const body = await request.json();
     const { email, password, confirmPassword } = body;
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const userExists = await User.findOne({ email });
+    const userExists = await db.collection('users').findOne({ email });
     if (userExists) {
       return NextResponse.json(
         { message: 'User already exists' },
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       );
     }
     const hashedPassword = await hashPassword(password);
-    await User.create({ email, password: hashedPassword });
+    await db.collection('users').insertOne({ email, password: hashedPassword });
     return NextResponse.json({ message: 'Registration successful' });
   } catch (error) {
     console.error("Register error:", error);
