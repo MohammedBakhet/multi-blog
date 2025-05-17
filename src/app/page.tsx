@@ -1,15 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PublicFeed from "./components/PublicFeed";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -17,67 +22,103 @@ export default function Home() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Something went wrong");
+      if (!response.ok) throw new Error(data.message || "Något gick fel");
       router.push("/explore");
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <main className="min-h-screen flex flex-col md:flex-row">
-      {/* Left side: Blog feed, blue background */}
-      <section className="flex-1 flex flex-col justify-center items-center bg-gradient-to-br from-blue-700 to-blue-400 p-0 md:p-8 relative overflow-hidden">
+      {/* Left side: Blog feed, animated gradient background */}
+      <section className="flex-1 flex flex-col justify-center items-center bg-gradient-to-br from-blue-700 via-indigo-600 to-blue-500 p-0 md:p-8 relative overflow-hidden animate-fadeIn">
         <div className="absolute inset-0 opacity-30 bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80)' }} />
+        
+        {/* Animerade cirklar i bakgrunden */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        
         <div className="relative z-10 w-full h-full flex flex-col justify-center items-center">
-          <PublicFeed />
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">Multi-<span className="gradient-text">Blog</span></h1>
+            <p className="text-white text-opacity-90 text-lg max-w-md">Upptäck en värld av tankar och idéer. Dela dina egna.</p>
+          </div>
+          <div className="w-full max-w-2xl animate-slideInUp">
+            <PublicFeed />
+          </div>
         </div>
       </section>
-      {/* Right side: Auth actions, black background */}
-      <section className="flex-1 flex flex-col justify-center items-center bg-black p-8 min-h-screen">
+      
+      {/* Right side: Auth actions, dark background */}
+      <section className="flex-1 flex flex-col justify-center items-center bg-black p-8 min-h-screen animate-fadeIn">
         <div className="w-full max-w-md space-y-8">
-          <h2 className="text-4xl font-extrabold text-white mb-2 text-center">Happening Now</h2>
-          <p className="text-xl text-white font-semibold mb-6 text-center">Join Multi-Blog today.</p>
+          <div className="text-center">
+            <h2 className="text-4xl font-extrabold mb-2">
+              <span className="gradient-text">Allt händer nu</span>
+            </h2>
+            <p className="text-xl text-white font-semibold mb-6">Gå med i Multi-Blog idag.</p>
+          </div>
           
           <div className="flex items-center my-4">
             <div className="flex-grow border-t border-gray-700" />
             <span className="mx-4 text-gray-400"></span>
             <div className="flex-grow border-t border-gray-700" />
           </div>
+          
           <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              <div className="bg-red-500 bg-opacity-20 border border-red-400 text-red-100 px-4 py-3 rounded animate-fadeIn">
                 {error}
               </div>
             )}
-            <input
-              type="email"
-              placeholder="Email address"
-              className="w-full px-3 py-2 border border-gray-700 rounded bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              required
-              autoComplete="off"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full px-3 py-2 border border-gray-700 rounded bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.password}
-              onChange={e => setFormData({ ...formData, password: e.target.value })}
-              required
-              autoComplete="off"
-            />
+            
+            <div className="group">
+              <input
+                type="email"
+                placeholder="E-postadress"
+                className="w-full px-4 py-3 border border-gray-700 rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                required
+                autoComplete="off"
+              />
+            </div>
+            
+            <div className="group">
+              <input
+                type="password"
+                placeholder="Lösenord"
+                className="w-full px-4 py-3 border border-gray-700 rounded-lg bg-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                value={formData.password}
+                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                required
+                autoComplete="off"
+              />
+            </div>
+            
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-600 transition"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all btn-hover-effect disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign in
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Loggar in...
+                </span>
+              ) : "Logga in"}
             </button>
           </form>
-          <div className="text-center mt-2">
-            <span className="text-gray-400">Don't have an account?</span>
-            <a href="/auth/register" className="ml-2 text-blue-400 hover:underline font-semibold">Sign up</a>
+          
+          <div className="text-center mt-6">
+            <span className="text-gray-400">Har du inget konto?</span>
+            <Link href="/auth/register" className="ml-2 text-blue-400 hover:text-blue-300 transition-colors font-semibold">Registrera dig</Link>
           </div>
         </div>
       </section>
