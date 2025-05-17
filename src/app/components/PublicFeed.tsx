@@ -8,8 +8,8 @@ interface Post {
 
 // Mock data for demonstration
 const MOCK_POSTS: Post[] = [
-  { id: 1, title: "Welcome to Multi-Blog!", snippet: "This is a public post. Log in to see more!" },
-  { id: 2, title: "Another Post", snippet: "You can only see a preview until you log in." },
+  { id: 1, title: "Välkommen till CryptoTalk!", snippet: "Detta är en publik crypto-diskussion. Logga in för att delta och se mer!" },
+  { id: 2, title: "Vad tror du om Bitcoin 2024?", snippet: "Diskutera trender, nyheter och prisutveckling med andra entusiaster." },
 ];
 
 export default function PublicFeed() {
@@ -25,18 +25,21 @@ export default function PublicFeed() {
   }, []);
 
   return (
-    <div className="w-full h-full p-8 overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-6 text-white">Latest Posts</h2>
+    <div className="w-full h-full p-8 overflow-y-auto bg-gradient-to-br from-blue-900/60 via-indigo-900/60 to-purple-900/60 rounded-2xl shadow-xl border border-blue-900/30 backdrop-blur-md">
+      <h2 className="text-3xl font-extrabold mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        Publika crypto-diskussioner
+      </h2>
       <ul className="space-y-6">
         {posts.map((post) => (
-          <li key={post.id} className="bg-white bg-opacity-10 rounded p-4 border border-white border-opacity-20">
-            <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
-            <p className="text-white text-opacity-80">{post.snippet}</p>
+          <li key={post.id} className="bg-black/60 rounded-xl p-6 border border-blue-900/30 shadow-md">
+            <h3 className="text-lg font-bold text-blue-300 mb-2">{post.title}</h3>
+            <p className="text-white text-opacity-90">{post.snippet}</p>
           </li>
         ))}
       </ul>
-      <div className="mt-8 text-white text-opacity-70 text-sm">
-        Log in to comment, like, and see full posts.
+      <div className="mt-10 text-center text-white text-opacity-80 text-base">
+        <span className="block mb-2">Logga in för att kommentera, gilla och se hela crypto-communityn!</span>
+        <span className="text-blue-400 font-semibold">Bli en del av CryptoTalk idag.</span>
       </div>
     </div>
   );

@@ -1,26 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '../../../lib/mongodb';
+import { ObjectId } from 'mongodb';
 import { extractCryptoTags } from '../../../lib/cryptoService';
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const cryptoTag = searchParams.get('cryptoTag');
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const cryptoTag = searchParams.get('cryptoTag');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '5');
+    const skip = (page - 1) * limit;
 
-  const client = await clientPromise;
-  const db = client.db();
-  
-  let query = {};
-  
-  // If cryptoTag is provided, filter posts by that crypto tag
-  if (cryptoTag) {
-    query = { 'cryptoTags.cryptoId': cryptoTag };
+    const client = await clientPromise;
+    const db = client.db();
+    let query = {};
+
+    if (cryptoTag) {
+      // Slå upp symbol och namn för cryptoId
+      const crypto = await db.collection('cryptocurrencies').findOne({ id: cryptoTag });
+      if (crypto) {
+        const symbol = crypto.symbol;
+        const name = crypto.name;
+        // Bygg regex som matchar $SYMBOL, #SYMBOL, SYMBOL, NAMN (case-insensitive)
+        const regex = new RegExp(`(\\$|#)${symbol}|${symbol}|${name}`, 'i');
+        query = {
+          $or: [
+            { 'cryptoTags.cryptoId': cryptoTag },
+            { text: { $regex: regex } },
+          ]
+        };
+      } else {
+        // Om ingen crypto hittas, returnera tomt resultat
+        return NextResponse.json({ posts: [] });
+      }
+    }
+
+    const posts = await db
+      .collection('posts')
+      .find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    return NextResponse.json({ posts });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch posts' },
+      { status: 500 }
+    );
   }
-  
-  const posts = await db.collection('posts')
-    .find(query)
-    .sort({ createdAt: -1 })
-    .toArray();
-  return NextResponse.json(posts);
 }
 
 export async function POST(req: NextRequest) {

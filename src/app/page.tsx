@@ -33,18 +33,22 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col md:flex-row">
-      {/* Left side: Blog feed, animated gradient background */}
-      <section className="flex-1 flex flex-col justify-center items-center bg-gradient-to-br from-blue-700 via-indigo-600 to-blue-500 p-0 md:p-8 relative overflow-hidden animate-fadeIn">
-        <div className="absolute inset-0 opacity-30 bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80)' }} />
+      {/* Vänster: Crypto feed, gradient och animation */}
+      <section className="flex-1 flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 p-0 md:p-8 relative overflow-hidden animate-fadeIn">
+        <div className="absolute inset-0 opacity-30 bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80)' }} />
         
         {/* Animerade cirklar i bakgrunden */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
         
         <div className="relative z-10 w-full h-full flex flex-col justify-center items-center">
           <div className="mb-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">Multi-<span className="gradient-text">Blog</span></h1>
-            <p className="text-white text-opacity-90 text-lg max-w-md">Upptäck en värld av tankar och idéer. Dela dina egna.</p>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+              Crypto<span className="gradient-text">Talk</span>
+            </h1>
+            <p className="text-white text-opacity-90 text-lg max-w-md">
+              Välkommen till CryptoTalk – Sveriges community för diskussioner om kryptovalutor, trender och blockchain! Dela dina tankar, följ marknaden och hitta likasinnade.
+            </p>
           </div>
           <div className="w-full max-w-2xl animate-slideInUp">
             <PublicFeed />
@@ -52,14 +56,14 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Right side: Auth actions, dark background */}
+      {/* Höger: Auth actions, mörk bakgrund */}
       <section className="flex-1 flex flex-col justify-center items-center bg-black p-8 min-h-screen animate-fadeIn">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <h2 className="text-4xl font-extrabold mb-2">
-              <span className="gradient-text">Allt händer nu</span>
+              <span className="gradient-text">Bli en del av CryptoTalk</span>
             </h2>
-            <p className="text-xl text-white font-semibold mb-6">Gå med i Multi-Blog idag.</p>
+            <p className="text-xl text-white font-semibold mb-6">Gå med i Sveriges crypto-community idag.</p>
           </div>
           
           <div className="flex items-center my-4">
@@ -102,7 +106,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all btn-hover-effect disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:from-blue-700 hover:to-purple-700 transition-all btn-hover-effect disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">

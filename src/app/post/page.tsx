@@ -5,15 +5,21 @@ import Header from '../(authenticated)/Header';
 import { Cryptocurrency, CryptoPostTag } from '../../lib/cryptoTypes';
 
 interface Post {
-  _id?: string;
+  _id: string;
   text: string;
   imageUrl?: string;
   userId?: string;
-  likes?: string[];
-  comments?: { userId: string; text: string; createdAt: string }[];
   createdAt?: string;
+  likes?: string[];
+  comments?: Comment[];
   profileImage?: string;
   cryptoTags?: CryptoPostTag[];
+}
+
+interface Comment {
+  userId: string;
+  text: string;
+  createdAt: string;
 }
 
 interface User {
@@ -58,9 +64,15 @@ const PostPage = () => {
   };
 
   const fetchPosts = async () => {
-    const res = await fetch('/api/posts');
-    const data = await res.json();
-    setPosts(data);
+    try {
+      const res = await fetch('/api/posts');
+      const data = await res.json();
+      // Säkerställ att vi hanterar API-svaret korrekt
+      setPosts(Array.isArray(data.posts) ? data.posts : []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setPosts([]);
+    }
   };
   
   const fetchCryptocurrencies = async () => {
@@ -230,178 +242,129 @@ const PostPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-[#181a20] text-white flex flex-col relative overflow-hidden">
       <Header />
-      <main className="pt-20 px-4 max-w-3xl mx-auto">
-        {/* Inläggsformulär */}
-        <div className="bg-gray-800 rounded-lg shadow-lg mb-8 overflow-hidden">
-          <div className="border-b border-gray-700 p-4">
-            <h1 className="text-xl font-bold">New Post</h1>
-          </div>
-          
-          <form onSubmit={handlePost} className="p-4">
-            <div className="mb-4">
-              <textarea
-                className="w-full bg-gray-700 bg-opacity-50 rounded-lg p-4 text-white placeholder-gray-400 border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors resize-none"
-                placeholder="What's happening in the crypto world? Use $BTC or #ETH to tag cryptocurrencies"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                maxLength={280}
-                rows={4}
-              />
-              
-              {/* Display detected crypto tags */}
-              {detectedTags.length > 0 && (
-                <div className="mt-2 p-3 bg-gray-700 bg-opacity-50 rounded-lg border border-blue-500">
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm font-medium text-blue-400">Detected Cryptocurrency Tags:</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {detectedTags.map((tag, idx) => {
-                      // Find the crypto data to display price info
-                      const cryptoData = cryptocurrencies.find(c => c.id === tag.cryptoId);
-                      return (
-                        <div 
-                          key={idx} 
-                          className="flex items-center bg-gray-800 rounded-lg px-3 py-1.5 border border-gray-600"
-                        >
-                          {cryptoData?.image && (
-                            <img src={cryptoData.image} alt={tag.name} className="w-5 h-5 mr-2 rounded-full" />
-                          )}
-                          <div>
-                            <span className="text-blue-400 font-medium">${tag.symbol.toUpperCase()}</span>
-                            <span className="text-gray-400 text-xs ml-1">({tag.name})</span>
-                            {cryptoData && (
-                              <span className={`ml-2 text-xs ${cryptoData.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                {cryptoData.price_change_percentage_24h >= 0 ? '+' : ''}
-                                {cryptoData.price_change_percentage_24h?.toFixed(2)}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Your post will be automatically tagged with these cryptocurrencies, making it easier for others to find.
-                  </p>
-                </div>
-              )}
-            </div>
-            
+      <main className="flex-grow flex flex-col items-center justify-start pt-24 relative z-10">
+        <div className="w-full max-w-3xl p-8 border border-blue-900/30 rounded-2xl shadow-2xl bg-black/80 animate-fadeIn backdrop-blur-md mb-8">
+          <h1 className="text-3xl font-extrabold mb-4 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Mina crypto-inlägg
+          </h1>
+          <p className="text-gray-300 mb-6 text-center">
+            Dela dina tankar om kryptovalutor, marknadstrender och blockchain. Tagga coins med <span className="text-blue-400">$BTC</span>, <span className="text-blue-400">#ETH</span> eller skriv coin-namnet för att länka till en valuta!
+          </p>
+          {/* Skapa nytt inlägg */}
+          <form onSubmit={handlePost} className="flex flex-col gap-4 mb-8">
+            <textarea
+              className="w-full rounded-lg bg-[#22242a] border border-blue-700 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Vad vill du diskutera? T.ex. $BTC till månen!"
+              rows={3}
+              maxLength={280}
+              required
+            />
             {imagePreview && (
-              <div className="mb-4 relative">
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
-                  className="w-full object-contain bg-black rounded-lg border border-gray-600" 
-                  style={{ maxHeight: '300px' }}
-                />
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setImage(null);
-                    setImagePreview(null);
-                  }}
-                  className="absolute top-2 right-2 bg-gray-900 bg-opacity-70 rounded-full p-1 hover:bg-opacity-100 transition-all"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+              <div className="mb-2 flex items-center gap-4">
+                <img src={imagePreview} alt="Förhandsvisning" className="w-24 h-24 object-cover rounded-lg border border-blue-700" />
+                <button type="button" onClick={() => { setImage(null); setImagePreview(null); }} className="text-red-400 hover:underline">Ta bort bild</button>
               </div>
             )}
-            
-            <div className="flex items-center justify-between border-t border-gray-700 pt-4">
-              <label className="cursor-pointer flex items-center hover:bg-gray-700 p-2 rounded-full transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-blue-400">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                </svg>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
+            <div className="flex items-center gap-4">
+              <label className="cursor-pointer text-blue-400 hover:underline">
+                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                Lägg till bild
               </label>
+              <div className="flex gap-2 flex-wrap">
+                {detectedTags.map(tag => (
+                  <span key={tag.cryptoId} className="px-2 py-1 rounded bg-blue-700/30 text-blue-300 text-xs font-semibold">{tag.symbol.toUpperCase()} ({tag.name})</span>
+                ))}
+              </div>
               <button
                 type="submit"
-                className={`${detectedTags.length > 0 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                  : 'bg-blue-600 hover:bg-blue-700'
-                } text-white font-semibold px-6 py-2 rounded-full transition-colors flex items-center gap-2 ${!input.trim() || loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={!input.trim() || loading}
+                disabled={loading || !input.trim()}
+                className="ml-auto px-6 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {detectedTags.length > 0 && (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                  </svg>
-                )}
-                {loading ? 'Posting...' : detectedTags.length > 0 ? 'Post with Crypto Tags' : 'Post'}
+                {loading ? 'Postar...' : 'Posta'}
               </button>
             </div>
           </form>
         </div>
-        
-        {/* Senaste inlägg */}
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
-          <div className="border-b border-gray-700 p-4 flex justify-between items-center">
-            <h2 className="text-xl font-bold">Senaste inlägg</h2>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm text-gray-400">Visa bara mina inlägg</label>
-              <input 
-                type="checkbox" 
-                checked={showOnlyUserPosts} 
-                onChange={(e) => setShowOnlyUserPosts(e.target.checked)}
-                className="form-checkbox h-5 w-5 text-blue-600 bg-gray-700 border-gray-500 rounded"
-              />
-            </div>
-          </div>
-          
-          <div className="divide-y divide-gray-700">
-            {showOnlyUserPosts ? (
-              // Visa bara användarens inlägg
-              posts.filter(post => [user?.name, ...oldNames].includes(post.userId || "")).length === 0 ? (
-                <div className="p-6 text-center text-gray-400">
-                  <p>Du har inte skapat några inlägg ännu</p>
-                  <p className="text-sm mt-2">Skriv något i formuläret ovan för att skapa ett nytt inlägg</p>
-                </div>
-              ) : (
-                posts
-                  .filter(post => [user?.name, ...oldNames].includes(post.userId || ""))
-                  .map((post) => (
-                    <PostItem
-                      key={post._id}
-                      post={post}
-                      isLikedByUser={isLikedByUser}
-                      handleLike={handleLike}
-                      handleDelete={handleDelete}
-                    />
-                  ))
-              )
-            ) : (
-              // Visa alla inlägg
-              posts.length === 0 ? (
-                <div className="p-6 text-center text-gray-400">
-                  <p>Inga inlägg ännu</p>
-                </div>
-              ) : (
-                posts.map((post) => (
-                  <PostItem
-                    key={post._id}
-                    post={post}
-                    isLikedByUser={isLikedByUser}
-                    handleLike={handleLike}
-                    handleDelete={[user?.name, ...oldNames].includes(post.userId || "") ? handleDelete : undefined}
-                  />
-                ))
-              )
-            )}
-          </div>
+        {/* Feed */}
+        <div className="w-full max-w-3xl p-8 border border-blue-900/30 rounded-2xl shadow-2xl bg-black/80 animate-fadeIn backdrop-blur-md">
+          <h2 className="text-2xl font-bold mb-6 text-blue-300">Dina senaste crypto-inlägg</h2>
+          {user && posts.filter(post => post.userId === user.name).length === 0 ? (
+            <div className="text-gray-400 text-center py-10">Du har inte postat något ännu. Bli först med att posta!</div>
+          ) : (
+            <ul className="space-y-8">
+              {user && posts
+                .filter(post => post.userId === user.name)
+                .map(post => (
+                  <li key={post._id} className="bg-[#181a20] border border-blue-900/30 rounded-xl p-6 shadow-md">
+                    <div className="flex items-center gap-3 mb-2">
+                      {post.profileImage ? (
+                        <img src={post.profileImage} alt="Profilbild" className="h-10 w-10 rounded-full object-cover bg-gray-700 border border-blue-700" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-white text-lg">
+                          <span>👤</span>
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white">{post.userId || 'Anonym'}</span>
+                        </div>
+                        <span className="text-xs text-gray-400">{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</span>
+                      </div>
+                    </div>
+                    <div className="mb-3 text-white text-base">
+                      {post.text}
+                    </div>
+                    {post.imageUrl && (
+                      <div className="mb-3">
+                        <img src={post.imageUrl} alt="Inläggsbild" className="w-full max-h-80 object-contain rounded-xl border border-blue-900/30 bg-black" />
+                      </div>
+                    )}
+                    {post.cryptoTags && post.cryptoTags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {post.cryptoTags.map((tag, index) => (
+                          <span key={index} className="px-2 py-1 rounded bg-blue-700/30 text-blue-300 text-xs font-semibold">{tag.symbol.toUpperCase()} ({tag.name})</span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-6 text-gray-400 text-sm mb-2">
+                      <button
+                        onClick={() => handleLike(post._id)}
+                        className={`flex items-center gap-1 ${isLikedByUser(post) ? 'text-pink-500' : 'text-gray-400 hover:text-pink-500'} transition`}
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-5 w-5" 
+                          viewBox="0 0 24 24" 
+                          fill={isLikedByUser(post) ? "currentColor" : "none"}
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isLikedByUser(post) ? "0" : "2"} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {post.likes?.length || 0} Likes
+                      </button>
+                      <span>{post.comments?.length || 0} Kommentarer</span>
+                      <button onClick={() => handleDelete(post._id)} className="text-red-400 hover:underline ml-auto">Radera</button>
+                    </div>
+                    {/* Kommentarer */}
+                    {post.comments && post.comments.length > 0 && (
+                      <div className="space-y-2 mb-2">
+                        {post.comments.map((comment, idx) => (
+                          <div key={idx} className="bg-[#22242a] rounded p-2 text-sm text-gray-200">
+                            <span className="font-semibold">{comment.userId}</span>{' '}
+                            <span className="text-xs text-gray-400">{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span>
+                            <div>{comment.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                ))}
+            </ul>
+          )}
         </div>
       </main>
     </div>
@@ -465,7 +428,7 @@ const PostItem = ({ post, isLikedByUser, handleLike, handleDelete }: PostItemPro
               </span>
               {handleDelete && (
                 <button
-                  onClick={() => handleDelete(post._id!)}
+                  onClick={() => handleDelete(post._id)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                   title="Radera inlägg"
                 >
@@ -511,7 +474,7 @@ const PostItem = ({ post, isLikedByUser, handleLike, handleDelete }: PostItemPro
           
           <div className="flex items-center space-x-4 text-gray-400">
             <button 
-              onClick={() => handleLike(post._id!)}
+              onClick={() => handleLike(post._id)}
               className={`flex items-center space-x-1 ${isLikedByUser(post) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'} transition-colors`}
             >
               <svg 
