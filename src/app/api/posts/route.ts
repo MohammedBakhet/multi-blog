@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '../../../lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { extractCryptoTags } from '../../../lib/cryptoService';
 
 export async function GET(request: Request) {
   try {
@@ -58,8 +59,19 @@ export async function POST(req: NextRequest) {
   if (!text && !imageUrl) {
     return NextResponse.json({ error: 'Text eller bild krävs' }, { status: 400 });
   }
+  
   const client = await clientPromise;
   const db = client.db();
+  
+  // Get top cryptocurrencies for tag extraction
+  const cryptos = await db.collection('cryptocurrencies')
+    .find({})
+    .limit(250)
+    .toArray();
+  
+  // Extract crypto tags from post text
+  const cryptoTags = text ? extractCryptoTags(text, cryptos) : [];
+  
   const newPost = {
     text: text || '',
     imageUrl: imageUrl || '',
@@ -67,7 +79,9 @@ export async function POST(req: NextRequest) {
     likes: [], // array av userId
     comments: [], // array av { userId, text, createdAt }
     createdAt: new Date(),
+    cryptoTags: cryptoTags,
   };
+  
   const result = await db.collection('posts').insertOne(newPost);
   return NextResponse.json({ ...newPost, _id: result.insertedId });
 }

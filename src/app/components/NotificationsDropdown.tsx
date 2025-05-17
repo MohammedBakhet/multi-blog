@@ -31,13 +31,13 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
       router.push(`/user/${notification.relatedUserId}`);
     }
   };
-  
+ 
   return (
     <div className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 animate-fadeIn">
       <div className="py-2 px-3 border-b border-gray-800 flex justify-between items-center">
         <div className="flex items-center">
           <h3 className="text-sm font-medium text-white">Notifikationer</h3>
-          
+         
           {/* Indikator för realtidsanslutning */}
           {isRealtimeConnected && (
             <div className="ml-2 flex items-center" title="Realtidsuppdateringar aktiva">
@@ -46,16 +46,16 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
             </div>
           )}
         </div>
-        
+       
         {/* Länk till notifikationssidan */}
-        <Link 
-          href="/notifications" 
+        <Link
+          href="/notifications"
           className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
         >
           Visa alla notifikationer
         </Link>
       </div>
-      
+     
       <div className="max-h-60 overflow-y-auto">
         {loading ? (
           <div className="flex justify-center items-center py-6">
@@ -80,10 +80,10 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
           ))
         )}
       </div>
-      
+     
       {notifications.length > 0 && (
         <div className="py-2 px-3 border-t border-gray-800 text-center">
-          <button 
+          <button
             onClick={onMarkAllAsRead}
             className="text-xs text-blue-400 hover:text-blue-300 transition-colors py-1 px-2 hover:bg-blue-900 hover:bg-opacity-30 rounded"
           >
@@ -95,4 +95,4 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
   );
 };
 
-export default NotificationsDropdown; 
+export default NotificationsDropdown;
