@@ -6,7 +6,12 @@ import { useNotifications } from '../../hooks/useNotifications';
 import NotificationsDropdown from '../components/NotificationsDropdown';
 import { NotificationType } from '../../lib/notifications';
 
-const Header = () => {
+// Lägg till prop:
+interface HeaderProps {
+  onSearchIconClick?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -100,7 +105,7 @@ const Header = () => {
               href="/explore" 
               className="flex items-center text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-300 hover:to-purple-400 transition"
             >
-              <span className="text-2xl mr-1">✦</span> Multi-Blog
+              <span className="text-2xl mr-1">✦</span> CryptoTalk
             </Link>
             <nav className="hidden md:ml-10 md:flex md:space-x-8">
               <Link 
@@ -138,7 +143,10 @@ const Header = () => {
           <div className="flex items-center">
             <div className="hidden md:flex md:items-center md:space-x-4">
               {/* Sökknapp med hover-effekt */}
-              <button className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 focus:outline-none">
+              <button 
+                className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 focus:outline-none"
+                onClick={onSearchIconClick}
+              >
                 <span className="sr-only">Sök</span>
                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

@@ -169,47 +169,4 @@ export const formatTimeAgo = (dateString: string): string => {
   
   const diffInMonths = Math.floor(diffInDays / 30);
   return `${diffInMonths}mån`;
-};
-
-// Skapa en ny notifikation lokalt - för teständamål
-export const createDummyNotification = (type: NotificationType): Notification => {
-  const id = Math.random().toString(36).substr(2, 9);
-  const now = new Date().toISOString();
-  
-  const userNames = ['Anna', 'Erik', 'Lisa', 'Johan', 'Maria'];
-  const randomUser = userNames[Math.floor(Math.random() * userNames.length)];
-  
-  let message = '';
-  switch(type) {
-    case NotificationType.LIKE:
-      message = `${randomUser} gillade ditt inlägg`;
-      break;
-    case NotificationType.COMMENT:
-      message = `${randomUser} kommenterade på ditt inlägg`;
-      break;
-    case NotificationType.FOLLOW:
-      message = `${randomUser} började följa dig`;
-      break;
-    case NotificationType.SYSTEM:
-      message = 'Välkommen till Multi-Blog!';
-      break;
-  }
-  
-  return {
-    id,
-    userId: 'current-user',
-    relatedUserId: type !== NotificationType.SYSTEM ? 'user-' + Math.floor(Math.random() * 1000) : undefined,
-    relatedUsername: type !== NotificationType.SYSTEM ? randomUser : undefined,
-    relatedUserImage: type !== NotificationType.SYSTEM ? 
-      `https://ui-avatars.com/api/?name=${randomUser}&background=384d7c&color=fff` : undefined,
-    type,
-    message,
-    postId: type !== NotificationType.FOLLOW && type !== NotificationType.SYSTEM ? 
-      'post-' + Math.floor(Math.random() * 1000) : undefined,
-    postTitle: type !== NotificationType.FOLLOW && type !== NotificationType.SYSTEM ? 
-      'Exempel på ett inlägg' : undefined,
-    isRead: false,
-    createdAt: now,
-    displayTime: formatTimeAgo(now)
-  };
 }; 
