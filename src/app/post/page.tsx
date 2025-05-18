@@ -38,6 +38,7 @@ const PostPage = () => {
   const [showOnlyUserPosts, setShowOnlyUserPosts] = useState(true);
   const [cryptocurrencies, setCryptocurrencies] = useState<Cryptocurrency[]>([]);
   const [detectedTags, setDetectedTags] = useState<CryptoPostTag[]>([]);
+  const [filterOption, setFilterOption] = useState<'latest' | 'mostLiked'>('latest');
 
   // Lista på möjliga gamla namn (lägg till fler om du haft flera)
   const oldNames = ["demo-user"];
@@ -241,6 +242,16 @@ const PostPage = () => {
     }
   };
 
+  const getFilteredPosts = () => {
+    let filtered = user ? posts.filter(post => post.userId === user.name) : [];
+    if (filterOption === 'mostLiked') {
+      filtered = [...filtered].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+    } else {
+      filtered = [...filtered].sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+    }
+    return filtered;
+  };
+
   return (
     <div className="min-h-screen bg-[#181a20] text-white flex flex-col relative overflow-hidden">
       <Header />
@@ -270,9 +281,11 @@ const PostPage = () => {
               </div>
             )}
             <div className="flex items-center gap-4">
-              <label className="cursor-pointer text-blue-400 hover:underline">
+              <label className="cursor-pointer text-blue-400 hover:text-blue-500 transition-colors">
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                Lägg till bild
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </label>
               <div className="flex gap-2 flex-wrap">
                 {detectedTags.map(tag => (
@@ -291,78 +304,88 @@ const PostPage = () => {
         </div>
         {/* Feed */}
         <div className="w-full max-w-3xl p-8 border border-blue-900/30 rounded-2xl shadow-2xl bg-black/80 animate-fadeIn backdrop-blur-md">
-          <h2 className="text-2xl font-bold mb-6 text-blue-300">Dina senaste crypto-inlägg</h2>
-          {user && posts.filter(post => post.userId === user.name).length === 0 ? (
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-blue-300">Dina senaste crypto-inlägg</h2>
+            <div className="relative">
+              <select
+                value={filterOption}
+                onChange={e => setFilterOption(e.target.value as 'latest' | 'mostLiked')}
+                className="bg-[#22242a] border border-blue-700 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="latest">Senaste</option>
+                <option value="mostLiked">Mest gillade</option>
+              </select>
+            </div>
+          </div>
+          {user && getFilteredPosts().length === 0 ? (
             <div className="text-gray-400 text-center py-10">Du har inte postat något ännu. Bli först med att posta!</div>
           ) : (
             <ul className="space-y-8">
-              {user && posts
-                .filter(post => post.userId === user.name)
-                .map(post => (
-                  <li key={post._id} className="bg-[#181a20] border border-blue-900/30 rounded-xl p-6 shadow-md">
-                    <div className="flex items-center gap-3 mb-2">
-                      {post.profileImage ? (
-                        <img src={post.profileImage} alt="Profilbild" className="h-10 w-10 rounded-full object-cover bg-gray-700 border border-blue-700" />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-white text-lg">
-                          <span>👤</span>
-                        </div>
-                      )}
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white">{post.userId || 'Anonym'}</span>
-                        </div>
-                        <span className="text-xs text-gray-400">{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</span>
-                      </div>
-                    </div>
-                    <div className="mb-3 text-white text-base">
-                      {post.text}
-                    </div>
-                    {post.imageUrl && (
-                      <div className="mb-3">
-                        <img src={post.imageUrl} alt="Inläggsbild" className="w-full max-h-80 object-contain rounded-xl border border-blue-900/30 bg-black" />
+              {user && getFilteredPosts().map((post) => (
+                <li key={post._id} className="bg-[#181a20] border border-blue-900/30 rounded-xl p-6 shadow-md">
+                  <div className="flex items-center gap-3 mb-2">
+                    {post.profileImage ? (
+                      <img src={post.profileImage} alt="Profilbild" className="h-10 w-10 rounded-full object-cover bg-gray-700 border border-blue-700" />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center text-white text-lg">
+                        <span>👤</span>
                       </div>
                     )}
-                    {post.cryptoTags && post.cryptoTags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {post.cryptoTags.map((tag, index) => (
-                          <span key={index} className="px-2 py-1 rounded bg-blue-700/30 text-blue-300 text-xs font-semibold">{tag.symbol.toUpperCase()} ({tag.name})</span>
-                        ))}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white">{post.userId || 'Anonym'}</span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-6 text-gray-400 text-sm mb-2">
-                      <button
-                        onClick={() => handleLike(post._id)}
-                        className={`flex items-center gap-1 ${isLikedByUser(post) ? 'text-pink-500' : 'text-gray-400 hover:text-pink-500'} transition`}
+                      <span className="text-xs text-gray-400">{post.createdAt ? new Date(post.createdAt).toLocaleString() : ''}</span>
+                    </div>
+                  </div>
+                  <div className="mb-3 text-white text-base">
+                    {post.text}
+                  </div>
+                  {post.imageUrl && (
+                    <div className="mb-3">
+                      <img src={post.imageUrl} alt="Inläggsbild" className="w-full max-h-80 object-contain rounded-xl border border-blue-900/30 bg-black" />
+                    </div>
+                  )}
+                  {post.cryptoTags && post.cryptoTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {post.cryptoTags.map((tag, index) => (
+                        <span key={index} className="px-2 py-1 rounded bg-blue-700/30 text-blue-300 text-xs font-semibold">{tag.symbol.toUpperCase()} ({tag.name})</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-6 text-gray-400 text-sm mb-2">
+                    <button
+                      onClick={() => handleLike(post._id)}
+                      className={`flex items-center gap-1 ${isLikedByUser(post) ? 'text-pink-500' : 'text-gray-400 hover:text-pink-500'} transition`}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5" 
+                        viewBox="0 0 24 24" 
+                        fill={isLikedByUser(post) ? "currentColor" : "none"}
+                        stroke="currentColor"
                       >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5" 
-                          viewBox="0 0 24 24" 
-                          fill={isLikedByUser(post) ? "currentColor" : "none"}
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isLikedByUser(post) ? "0" : "2"} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        {post.likes?.length || 0} Likes
-                      </button>
-                      <span>{post.comments?.length || 0} Kommentarer</span>
-                      <button onClick={() => handleDelete(post._id)} className="text-red-400 hover:underline ml-auto">Radera</button>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isLikedByUser(post) ? "0" : "2"} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      {post.likes?.length || 0} Likes
+                    </button>
+                    <span>{post.comments?.length || 0} Kommentarer</span>
+                    <button onClick={() => handleDelete(post._id)} className="text-red-400 hover:underline ml-auto">Radera</button>
+                  </div>
+                  {/* Kommentarer */}
+                  {post.comments && post.comments.length > 0 && (
+                    <div className="space-y-2 mb-2">
+                      {post.comments.map((comment, idx) => (
+                        <div key={idx} className="bg-[#22242a] rounded p-2 text-sm text-gray-200">
+                          <span className="font-semibold">{comment.userId}</span>{' '}
+                          <span className="text-xs text-gray-400">{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span>
+                          <div>{comment.text}</div>
+                        </div>
+                      ))}
                     </div>
-                    {/* Kommentarer */}
-                    {post.comments && post.comments.length > 0 && (
-                      <div className="space-y-2 mb-2">
-                        {post.comments.map((comment, idx) => (
-                          <div key={idx} className="bg-[#22242a] rounded p-2 text-sm text-gray-200">
-                            <span className="font-semibold">{comment.userId}</span>{' '}
-                            <span className="text-xs text-gray-400">{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ''}</span>
-                            <div>{comment.text}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </li>
-                ))}
+                  )}
+                </li>
+              ))}
             </ul>
           )}
         </div>

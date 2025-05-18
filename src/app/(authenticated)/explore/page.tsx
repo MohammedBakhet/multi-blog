@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '../Header';
 import { Cryptocurrency, CryptoSortOption, CryptoPostTag } from '../../../lib/cryptoTypes';
 import CryptoFilter from './components/CryptoFilter';
+import { FaFilter } from 'react-icons/fa';
 
 interface Comment {
   userId: string;
@@ -83,7 +84,11 @@ const ExplorePage = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+  const [filterOption, setFilterOption] = useState<'latest' | 'mostLiked'>('latest');
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     fetchUser();
     fetchPosts();
@@ -136,7 +141,7 @@ const ExplorePage = () => {
     
     try {
       const res = await fetch(`/api/posts?cryptoTag=${cryptoId}&page=${pageNum}&limit=${POSTS_PER_PAGE}`);
-      const data = await res.json();
+    const data = await res.json();
       
       if (append) {
         setPosts(prev => [...prev, ...data.posts]);
@@ -148,7 +153,7 @@ const ExplorePage = () => {
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
-      setLoading(false);
+    setLoading(false);
       setLoadingMore(false);
     }
   };
@@ -218,7 +223,7 @@ const ExplorePage = () => {
     if (selectedCryptoFilter) {
       await fetchPostsByTag(selectedCryptoFilter);
     } else {
-      await fetchPosts();
+    await fetchPosts();
     }
     
     setLikeLoading(l => ({ ...l, [postId]: false }));
@@ -239,7 +244,7 @@ const ExplorePage = () => {
     if (selectedCryptoFilter) {
       await fetchPostsByTag(selectedCryptoFilter);
     } else {
-      await fetchPosts();
+    await fetchPosts();
     }
     
     setCommentLoading(c => ({ ...c, [postId]: false }));
@@ -256,7 +261,7 @@ const ExplorePage = () => {
     if (selectedCryptoFilter) {
       await fetchPostsByTag(selectedCryptoFilter);
     } else {
-      await fetchPosts();
+    await fetchPosts();
     }
   };
   
@@ -312,6 +317,33 @@ const ExplorePage = () => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [searchOpen]);
 
+  const getFilteredPosts = () => {
+    let filtered = posts ? [...posts] : [];
+    if (filterOption === 'mostLiked') {
+      filtered.sort((a, b) => ((b.likes ? b.likes.length : 0) - (a.likes ? a.likes.length : 0)));
+    } else {
+      filtered.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+    }
+    return filtered;
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!filterDropdownOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target as Node)
+      ) {
+        setFilterDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterDropdownOpen]);
+
   return (
     <div className="min-h-screen text-white flex flex-col relative overflow-hidden bg-[#181a20]">
       <Header onSearchIconClick={handleSearchIconClick} />
@@ -353,29 +385,8 @@ const ExplorePage = () => {
           </div>
         </div>
       )}
-      {/* Hero/banner */}
-      <section className="w-full py-12 md:py-20 px-4 flex flex-col items-center justify-center relative z-10">
-        <div className="max-w-3xl mx-auto text-center bg-black/60 rounded-2xl p-8 shadow-2xl border border-blue-900/30 backdrop-blur-md animate-fadeIn relative">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Utforska Crypto-Communityt
-          </h1>
-          <p className="text-lg md:text-xl text-white text-opacity-90 mb-4">
-            Upptäck trender, diskutera coins och hitta likasinnade. Filtrera, sortera och delta i Sveriges mest engagerande crypto-forum!
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center mt-4">
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold shadow">#Bitcoin</span>
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-green-400 to-blue-500 text-white text-xs font-bold shadow">#Ethereum</span>
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xs font-bold shadow">#Altcoins</span>
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold shadow">#NFT</span>
-            <span className="px-3 py-1 rounded-full bg-gradient-to-r from-blue-400 to-green-400 text-white text-xs font-bold shadow">#DeFi</span>
-          </div>
-        </div>
-        {/* Bakgrundsdekor */}
-        <div className="absolute left-0 top-1/2 w-40 h-40 bg-blue-500 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ zIndex: 0 }}></div>
-        <div className="absolute right-0 top-1/3 w-32 h-32 bg-purple-500 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ zIndex: 0 }}></div>
-      </section>
       {/* Grid layout: filter + feed */}
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-8 z-10 relative">
+      <main className="flex-grow w-full max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-8 z-10 relative mt-24">
         {/* Flytande filter-knapp */}
         <button
           onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -412,6 +423,36 @@ const ExplorePage = () => {
 
         {/* Feed med full bredd när filtret är stängt */}
         <section className={`w-full transition-all duration-300 ${isFilterOpen ? 'md:ml-80' : ''}`}>
+          {/* Filter button with icon */}
+          <div className="flex justify-end items-center mb-4 relative">
+            <button
+              ref={filterButtonRef}
+              onClick={() => setFilterDropdownOpen((open) => !open)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#22242a] border border-blue-700 text-white rounded-lg hover:bg-blue-900/30 transition focus:outline-none"
+            >
+              <FaFilter className="h-5 w-5" />
+              <span className="hidden sm:inline">Filtrera</span>
+            </button>
+            {filterDropdownOpen && (
+              <div
+                ref={filterDropdownRef}
+                className="absolute right-0 top-full mt-2 w-44 bg-[#22242a] border border-blue-700 rounded-lg shadow-lg z-50"
+              >
+                <button
+                  className={`w-full text-left px-4 py-2 hover:bg-blue-900/30 rounded-t-lg ${filterOption === 'latest' ? 'bg-blue-900/20 font-bold' : ''}`}
+                  onClick={() => { setFilterOption('latest'); setFilterDropdownOpen(false); }}
+                >
+                  Senaste
+                </button>
+                <button
+                  className={`w-full text-left px-4 py-2 hover:bg-blue-900/30 rounded-b-lg ${filterOption === 'mostLiked' ? 'bg-blue-900/20 font-bold' : ''}`}
+                  onClick={() => { setFilterOption('mostLiked'); setFilterDropdownOpen(false); }}
+                >
+                  Mest gillade
+                </button>
+              </div>
+            )}
+          </div>
           {/* Selected crypto info */}
           {selectedCryptoFilter && cryptocurrencies.length > 0 && (
             <div className="px-6 pt-6 pb-2 border-b border-gray-700 mb-4 rounded-xl bg-gradient-to-r from-blue-900/40 to-purple-900/40 shadow">
@@ -452,7 +493,7 @@ const ExplorePage = () => {
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500"></div>
               </div>
-            ) : posts.length === 0 ? (
+            ) : getFilteredPosts().length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-gray-400 mb-3 text-lg">Inga inlägg ännu med {selectedCryptoFilter ? 'denna kryptovaluta' : ''}</p>
                 {selectedCryptoFilter && (
@@ -466,7 +507,7 @@ const ExplorePage = () => {
               </div>
             ) : (
               <ul className="space-y-8">
-                {posts.map(post => (
+                {getFilteredPosts().map(post => (
                   <li key={post._id} className="bg-[#181a20] border border-blue-900/30 rounded-xl p-6 shadow-md hover:shadow-2xl transition-shadow duration-300 group relative overflow-hidden">
                     {/* Bakgrundsdekor för varje post */}
                     <div className="absolute -top-8 -right-8 w-24 h-24 bg-blue-700 opacity-10 rounded-full blur-2xl z-0"></div>
@@ -530,10 +571,10 @@ const ExplorePage = () => {
                         className={`flex items-center gap-1 ${isLikedByUser(post) ? 'text-pink-500' : 'text-gray-400 hover:text-pink-500'} transition`}
                         disabled={likeLoading[post._id]}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          className="h-5 w-5" 
+                          viewBox="0 0 24 24" 
                           fill={isLikedByUser(post) ? "currentColor" : "none"}
                           stroke="currentColor"
                         >
@@ -619,7 +660,7 @@ const ExplorePage = () => {
           {!loading && posts.length > 0 && !hasMore && (
             <div className="text-center py-8 text-gray-400">
               <p>Inga fler inlägg att visa</p>
-            </div>
+          </div>
           )}
         </section>
       </main>

@@ -42,10 +42,7 @@ const CryptoFilter: React.FC<CryptoFilterProps> = ({
         <div className="mb-6">
           <label className="block text-sm text-gray-400 mb-2 font-medium">Sortera efter</label>
           <select
-            className="w-full bg-[#16181c]/80 border border-gray-600/50 rounded-lg px-4 py-3 text-sm text-white
-                     focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-300 cursor-pointer
-                     backdrop-blur-sm"
+            className="w-full bg-[#16181c]/80 border border-gray-600/50 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 cursor-pointer backdrop-blur-sm"
             value={sortOption}
             onChange={(e) => onSortChange(e.target.value as CryptoSortOption)}
           >
@@ -60,10 +57,7 @@ const CryptoFilter: React.FC<CryptoFilterProps> = ({
         {selectedCryptoId && (
           <button
             onClick={clearFilter}
-            className="w-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white px-4 py-3 rounded-lg
-                     hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-300
-                     flex items-center justify-center gap-2 border border-gray-600/50
-                     backdrop-blur-sm group"
+            className="w-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white px-4 py-3 rounded-lg hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-300 flex items-center justify-center gap-2 border border-gray-600/50 backdrop-blur-sm group"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform group-hover:rotate-90 transition-transform duration-300" 
                  viewBox="0 0 20 20" fill="currentColor">
@@ -110,8 +104,7 @@ const CryptoFilter: React.FC<CryptoFilterProps> = ({
                           isHovered === crypto.id ? 'scale-110' : ''
                         }`}
                       />
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 
-                                    border-2 border-[#1a1c23] flex items-center justify-center">
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 border-2 border-[#1a1c23] flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white">
                           {crypto.market_cap_rank}
                         </span>
@@ -128,10 +121,7 @@ const CryptoFilter: React.FC<CryptoFilterProps> = ({
                         ${crypto.current_price?.toLocaleString()}
                       </div>
                     </div>
-                    <div className={`text-sm font-medium px-3 py-1 rounded-full transition-all duration-300
-                                  ${crypto.price_change_percentage_24h >= 0 
-                                    ? 'bg-green-500/10 text-green-400' 
-                                    : 'bg-red-500/10 text-red-400'}`}>
+                    <div className={`text-sm font-medium px-3 py-1 rounded-full transition-all duration-300 ${crypto.price_change_percentage_24h >= 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                       {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
                       {crypto.price_change_percentage_24h?.toFixed(2)}%
                     </div>

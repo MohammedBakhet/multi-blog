@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useNotifications } from '../../hooks/useNotifications';
 import NotificationsDropdown from '../components/NotificationsDropdown';
 import { NotificationType } from '../../lib/notifications';
+import { FiCompass, FiTrendingUp, FiEdit, FiUser, FiBell, FiLogOut } from 'react-icons/fi';
 
 // Lägg till prop:
 interface HeaderProps {
@@ -94,12 +95,14 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-black bg-opacity-90 backdrop-blur-md shadow-lg' : 'bg-black'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
+        ${scrolled
+          ? 'bg-black bg-opacity-80 backdrop-blur-lg shadow-2xl opacity-90'
+          : 'bg-black bg-opacity-100 opacity-100'}
+        h-20 md:h-18 flex items-center`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full">
+        <div className="flex justify-between h-20 md:h-24 items-center">
           <div className="flex items-center">
             <Link 
               href="/explore" 
@@ -117,10 +120,21 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
                 }`}
               >
                 <span className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                  </svg>
+                  <FiCompass className="h-4 w-4 mr-1" />
                   Utforska
+                </span>
+              </Link>
+              <Link 
+                href="/crypto-news" 
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                  isActive('/crypto-news') 
+                    ? 'text-white bg-blue-600' 
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                }`}
+              >
+                <span className="flex items-center">
+                  <FiTrendingUp className="h-4 w-4 mr-1" />
+                  Crypto News
                 </span>
               </Link>
               <Link 
@@ -132,9 +146,7 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
                 }`}
               >
                 <span className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+                  <FiEdit className="h-4 w-4 mr-1" />
                   Skapa inlägg
                 </span>
               </Link>
@@ -142,16 +154,8 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
           </div>
           <div className="flex items-center">
             <div className="hidden md:flex md:items-center md:space-x-4">
-              {/* Sökknapp med hover-effekt */}
-              <button 
-                className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 focus:outline-none"
-                onClick={onSearchIconClick}
-              >
-                <span className="sr-only">Sök</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
+              
+             
               
               {/* Notifikationsklocka med dropdown */}
               <div className="relative notifications-dropdown">
@@ -162,9 +166,7 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
                   onClick={handleNotificationsClick}
                 >
                   <span className="sr-only">Visa notifikationer</span>
-                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
+                  <FiBell className="h-5 w-5" />
                   
                   {/* Indikator för nya notifikationer */}
                   {unreadCount > 0 && (
@@ -206,9 +208,10 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
                   </Link>
                   <button 
                     onClick={handleLogout}
-                    className="btn-hover-effect text-sm text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md transition-all"
+                    className="btn-hover-effect text-sm text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md transition-all flex items-center gap-2"
                   >
                     Logga ut
+                    <FiLogOut className="h-5 w-5 ml-1" />
                   </button>
                 </div>
               </div>
@@ -257,13 +260,23 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
               onClick={() => setIsMenuOpen(false)}
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/explore') ? 'text-white bg-blue-600' : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
             >
+              <FiCompass className="h-4 w-4 mr-1" />
               Utforska
+            </Link>
+            <Link 
+              href="/crypto-news" 
+              onClick={() => setIsMenuOpen(false)}
+              className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/crypto-news') ? 'text-white bg-blue-600' : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
+            >
+              <FiTrendingUp className="h-4 w-4 mr-1" />
+              Crypto News
             </Link>
             <Link 
               href="/post" 
               onClick={() => setIsMenuOpen(false)}
               className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/post') ? 'text-white bg-blue-600' : 'text-gray-300 hover:text-white hover:bg-gray-700'}`}
             >
+              <FiEdit className="h-4 w-4 mr-1" />
               Skapa inlägg
             </Link>
             <Link 
@@ -282,6 +295,7 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
               }}
               className="flex justify-between items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
             >
+              <FiBell className="h-5 w-5" />
               Notifikationer
               {unreadCount > 0 && (
                 <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -291,9 +305,10 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
             </Link>
             <button 
               onClick={handleLogout}
-              className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+              className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700 transition-colors flex items-center gap-2"
             >
               Logga ut
+              <FiLogOut className="h-5 w-5 ml-1" />
             </button>
           </div>
         </div>
