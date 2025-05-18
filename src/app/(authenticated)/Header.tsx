@@ -97,15 +97,15 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
         ${scrolled
-          ? 'bg-black bg-opacity-80 backdrop-blur-lg shadow-2xl opacity-90'
-          : 'bg-black bg-opacity-100 opacity-100'}
+          ? 'bg-transparent bg-opacity-80 backdrop-blur-lg shadow-2xl opacity-90'
+          : 'bg-transparent bg-opacity-100 opacity-100'}
         h-20 md:h-18 flex items-center`}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 w-full">
         <div className="flex justify-between h-20 md:h-24 items-center">
           <div className="flex items-center">
             <Link 
-              href="/explore" 
+              href="/home" 
               className="flex items-center text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-300 hover:to-purple-400 transition"
             >
               <span className="text-2xl mr-1">✦</span> CryptoTalk
@@ -154,8 +154,15 @@ const Header: React.FC<HeaderProps> = ({ onSearchIconClick }) => {
           </div>
           <div className="flex items-center">
             <div className="hidden md:flex md:items-center md:space-x-4">
-              
-             
+              <button 
+                className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200 focus:outline-none"
+                onClick={onSearchIconClick}
+              >
+                <span className="sr-only">Sök</span>
+                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
               
               {/* Notifikationsklocka med dropdown */}
               <div className="relative notifications-dropdown">

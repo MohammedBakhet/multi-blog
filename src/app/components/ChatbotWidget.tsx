@@ -35,7 +35,7 @@ export default function ChatbotWidget() {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div className="fixed bottom-32 right-5 z-50">
       {/* Chatbot-knapp */}
       <button
         onClick={() => setIsOpen(!isOpen)}

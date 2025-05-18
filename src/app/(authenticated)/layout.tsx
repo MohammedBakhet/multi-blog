@@ -40,7 +40,7 @@ export default function AuthenticatedLayout({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+    <div className="min-h-screen flex flex-col bg-[#181a20] text-white">
       {/* Header-komponenten läggs till i varje barnsida istället för här för att undvika dubbla headers */}
 
       {/* Huvudinnehåll */}
@@ -49,7 +49,7 @@ export default function AuthenticatedLayout({
       </main>
 
       {/* Sidfot */}
-      <footer className="bg-black border-t border-gray-800 py-8 mt-12">
+      <footer className="bg-transparent border-t border-gray-800 py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
