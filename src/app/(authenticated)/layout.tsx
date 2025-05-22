@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ChatbotWrapper from '../components/ChatbotWrapper';
 
 export default function AuthenticatedLayout({
   children,
@@ -150,6 +151,7 @@ export default function AuthenticatedLayout({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         </svg>
       </button>
+      <ChatbotWrapper />
     </div>
   );
 } 

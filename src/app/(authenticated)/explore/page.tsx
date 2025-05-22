@@ -51,12 +51,11 @@ const formatPostTextWithCryptoMentions = (text: string, cryptoTags?: CryptoPostT
   // Create a map to replace symbols with styled versions
   let formattedText = text;
   
-  // Replace $SYMBOL mentions with styled versions
   cryptoTags.forEach(tag => {
     const regex = new RegExp(`\\$${tag.symbol}\\b`, 'gi');
     formattedText = formattedText.replace(regex, `<span class="text-blue-400 font-medium cursor-pointer hover:underline">$${tag.symbol.toUpperCase()}</span>`);
     
-    // Also try to replace the crypto name (like "Bitcoin")
+    
     const nameRegex = new RegExp(`\\b${tag.name}\\b`, 'gi');
     formattedText = formattedText.replace(nameRegex, `<span class="text-blue-400 font-medium cursor-pointer hover:underline">${tag.name}</span>`);
   });
@@ -96,7 +95,7 @@ const ExplorePage = () => {
   }, []);
   
   useEffect(() => {
-    // Re-fetch posts when crypto filter changes
+   
     if (selectedCryptoFilter) {
       fetchPostsByTag(selectedCryptoFilter);
     } else {

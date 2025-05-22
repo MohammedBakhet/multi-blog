@@ -2,17 +2,15 @@ import clientPromise from './mongodb';
 import { Cryptocurrency, CryptoFilter, CryptoSortOption, PostWithCryptoTags, CryptoPostTag } from './cryptoTypes';
 import { WithId, Document } from 'mongodb';
 
-// CoinGecko API base URL
+
 const API_BASE_URL = 'https://api.coingecko.com/api/v3';
 const API_KEY = process.env.COINGECKO_API_KEY;
 
-// Cache settings
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const CACHE_DURATION = 5 * 60 * 1000; 
 const cryptoCache = new Map<string, { data: any; timestamp: number }>();
 
-/**
- * Fetch top cryptocurrencies from CoinGecko API with caching
- */
+
 export async function fetchTopCryptocurrencies(limit: number = 100): Promise<Cryptocurrency[]> {
   const cacheKey = `top_${limit}`;
   const cached = cryptoCache.get(cacheKey);

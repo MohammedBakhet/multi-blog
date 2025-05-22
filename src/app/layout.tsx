@@ -2,7 +2,6 @@ import "./globals.css";
 import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import ChatbotWrapper from './components/ChatbotWrapper';
 
 // Ladda Inter-fonten
 const inter = Inter({ subsets: ["latin"] });
@@ -17,7 +16,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="sv">
       <body className={inter.className}>
         {children}
-        <ChatbotWrapper />
       </body>
     </html>
   );
